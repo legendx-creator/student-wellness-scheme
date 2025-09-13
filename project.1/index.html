@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌿 MyWellness Hub 🌿</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #D4FC79, #96E6A1);
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+header {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.85);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    animation: fadeIn 1s ease-in;
+}
+.container {
+    max-width: 900px;
+    width: 95%;
+    background: white;
+    margin-top: 20px;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    animation: fadeIn 1.5s ease-in;
+}
+.option-btn {
+    width: 100%;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.option-btn:hover {
+    transform: scale(1.05);
+    background-color: #ACDFFB;
+    color: #000;
+}
+#progress {
+    height: 12px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    margin-bottom: 20px;
+}
+#progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #4CAF50;
+    border-radius: 5px;
+    transition: width 0.3s ease;
+}
+.hidden {
+    display: none;
+}
+footer {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 14px;
+    color: #333;
+}
+.graphs-dos-donts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+.graph-container, .dos-donts {
+    flex: 1 1 45%;
+    min-width: 300px;
+}
+ul {
+    padding-left: 20px;
+}
+@keyframes fadeIn {
+    from {opacity:0;}
+    to {opacity:1;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌿 MyWellness Hub 🌿</h1>
+  <p>Your Student Wellness Companion</p>
+</header>
+
+<div class="container" id="signinSection">
+  <h3 class="text-center mb-4">👋 Welcome! Please Log In</h3>
+  <form id="signinForm">
+    <input type="text" class="form-control mb-3" id="signinUsername" placeholder="Enter Username" required/>
+    <input type="password" class="form-control mb-3" id="signinPassword" placeholder="Enter Password" required/>
+    <button type="submit" class="btn btn-primary w-100">Sign In</button>
+  </form>
+</div>
+
+<div class="container hidden" id="questionSection">
+  <h3 id="greeting" class="text-center mb-3"></h3>
+  <div id="progress"><div id="progress-bar"></div></div>
+  <h5 id="questionText" class="mb-4"></h5>
+  <div id="optionsContainer"></div>
+  <button id="backBtn" class="btn btn-secondary mt-3">⬅️ Back</button>
+</div>
+
+<div class="container hidden" id="resultsSection">
+  <h3 class="text-center mb-3">📊 Your Wellness Report</h3>
+  <div class="graphs-dos-donts">
+    <div class="graph-container">
+      <canvas id="mentalChart"></canvas>
+    </div>
+    <div class="graph-container">
+      <canvas id="physicalChart"></canvas>
+    </div>
+    <div class="graph-container">
+      <canvas id="sleepChart"></canvas>
+    </div>
+    <div class="graph-container">
+      <canvas id="nutritionChart"></canvas>
+    </div>
+    <div class="dos-donts">
+      <h4>✅ Do's</h4>
+      <ul>
+        <li>Take short breaks during study sessions.</li>
+        <li>Maintain a healthy sleep schedule.</li>
+        <li>Eat balanced meals and stay hydrated.</li>
+        <li>Exercise moderately at least 3 times a week.</li>
+        <li>Practice mindfulness or meditation.</li>
+      </ul>
+    </div>
+    <div class="dos-donts">
+      <h4>❌ Don'ts</h4>
+      <ul>
+        <li>Avoid excessive screen time before sleep.</li>
+        <li>Do not skip meals or rely on junk food.</li>
+        <li>Don't ignore mental health signs.</li>
+        <li>Limit caffeine and sugar intake.</li>
+        <li>Don't procrastinate important tasks.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<footer>Help Center: 📧 studentwellness@domain.com | ☎️ 123-456-7890</footer>
+
+<script>
+const questions = [
+  { text: "How energetic do you feel today?", options: ["😊 Very energetic","🙂 Somewhat energetic","😔 Tired","😞 Very tired"] },
+  { text: "How's your focus right now?", options: ["🎯 Excellent","👍 Good","😐 Average","🚫 Poor"] },
+  { text: "Are you feeling stressed?", options: ["😌 Not at all","😕 A little","😟 Somewhat stressed","😣 Very stressed"] },
+  { text: "How motivated are you to study?", options: ["📚 Highly motivated","🙂 Motivated","😐 Neutral","😞 Unmotivated"] },
+  { text: "Do you feel supported by friends/family?", options: ["❤️ Yes always","🤝 Sometimes","🙁 Rarely","😢 Never"] },
+  { text: "Are you eating healthily today?", options: ["🥗 Yes","🍽️ Mostly healthy","🍔 Somewhat unhealthy","🍕 Unhealthy"] },
+  { text: "How many hours did you sleep last night?", options: ["😴 8+ hours","😌 6–7 hours","😐 4–5 hours","😟 <4 hours"] },
+  { text: "Do you feel connected to your studies?", options: ["🎓 Very connected","📘 Somewhat connected","😐 Neutral","😕 Disconnected"] },
+  { text: "How's your mood today?", options: ["😀 Very happy","🙂 Content","😐 Neutral","😢 Sad"] },
+  { text: "Would you like to talk to a counselor?", options: ["👍 Yes","🤔 Maybe","🙅 Not now","❌ Never"] }
+];
+
+let currentStep = 0;
+let username = '';
+let userAnswers = [];
+
+document.getElementById('signinForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  username = document.getElementById('signinUsername').value.trim();
+  document.getElementById('signinSection').classList.add('hidden');
+  document.getElementById('questionSection').classList.remove('hidden');
+  updateGreeting();
+  displayQuestion();
+});
+
+function updateGreeting(){
+  const hour = new Date().getHours();
+  let greet = "Hello!";
+  if(hour<12) greet="Good Morning 🌞";
+  else if(hour<16) greet="Good Afternoon ☀️";
+  else if(hour<20) greet="Good Evening 🌇";
+  else greet="Good Night 🌙";
+  document.getElementById('greeting').innerText = `${greet}, ${username}! Let's take care of your wellness today.`;
+}
+
+function displayQuestion(){
+  if(currentStep>=questions.length){
+    document.getElementById('questionSection').classList.add('hidden');
+    document.getElementById('resultsSection').classList.remove('hidden');
+    showGraphs();
+    return;
+  }
+  const q = questions[currentStep];
+  document.getElementById('questionText').innerText = q.text;
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML='';
+  q.options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.className = "btn btn-outline-primary option-btn";
+    btn.innerText = opt;
+    btn.onclick = ()=>{
+      userAnswers.push({question:q.text, answer:opt});
+      currentStep++;
+      updateProgress();
+      displayQuestion();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function updateProgress(){
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = ((currentStep/questions.length)*100)+"%";
+}
+
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  if(currentStep>0){
+    currentStep--;
+    userAnswers.pop();
+    updateProgress();
+    displayQuestion();
+  }
+});
+
+function showGraphs(){
+  // Generate dummy data based on answers
+  const mental = [3,2,4,1];
+  const physical = [2,3,1,4];
+  const sleep = [3,1,4,2];
+  const nutrition = [2,4,3,1];
+  new Chart(document.getElementById('mentalChart'), {
+    type:'bar',
+    data:{labels:['Very High','High','Low','Very Low'],datasets:[{label:'Mental Health',data:mental,backgroundColor:'#4CAF50'}]}
+  });
+  new Chart(document.getElementById('physicalChart'), {
+    type:'bar',
+    data:{labels:['Excellent','Good','Average','Poor'],datasets:[{label:'Physical Health',data:physical,backgroundColor:'#2196F3'}]}
+  });
+  new Chart(document.getElementById('sleepChart'), {
+    type:'bar',
+    data:{labels:['Excellent','Good','Average','Poor'],datasets:[{label:'Sleep Quality',data:sleep,backgroundColor:'#FF9800'}]}
+  });
+  new Chart(document.getElementById('nutritionChart'), {
+    type:'bar',
+    data:{labels:['Excellent','Good','Average','Poor'],datasets:[{label:'Nutrition',data:nutrition,backgroundColor:'#E91E63'}]}
+  });
+}
+</script>
+</body>
+</html>
